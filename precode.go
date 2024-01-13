@@ -1,12 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"pkg/task"
 )
+
+// Task ...
+type Task struct {
+	ID           string   `json:"id"`
+	Description  string   `json:"description"`
+	Note         string   `json:"note"`
+	Applications []string `json:"applications"`
+}
 
 var tasks = map[string]Task{
 	"1": {
@@ -34,14 +42,34 @@ var tasks = map[string]Task{
 
 // Ниже напишите обработчики для каждого эндпоинта
 // ...
+/*
+Обработчик должен вернуть все задачи, которые хранятся в мапе.
+*/
+func getAllTasks(w http.ResponseWriter, r *http.Request) {
+
+	resp, err := json.Marshal(tasks)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// в заголовок записываем тип контента, у нас это данные в формате JSON
+	w.Header().Set("Content-Type", "application/json")
+	// так как все успешно, то статус OK
+	w.WriteHeader(http.StatusOK)
+	// записываем сериализованные в JSON данные в тело ответа
+	w.Write(resp)
+
+}
 
 func main() {
-	r := chi.NewRouter()
+	mux := chi.NewRouter()
 
 	// здесь регистрируйте ваши обработчики
 	// ...
+	mux.Get("/tasks", getAllTasks)
 
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	if err := http.ListenAndServe(":8080", mux); err != nil {
 		fmt.Printf("Ошибка при запуске сервера: %s", err.Error())
 		return
 	}
