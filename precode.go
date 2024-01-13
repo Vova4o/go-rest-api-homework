@@ -5,15 +5,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"pkg/task"
 )
-
-// Task ...
-type Task struct {
-	ID           string   `json:"id"`
-	Description  string   `json:"description"`
-	Note         string   `json:"note"`
-	Applications []string `json:"applications"`
-}
 
 var tasks = map[string]Task{
 	"1": {
